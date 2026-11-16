@@ -7,18 +7,16 @@ around Hyprland. It combines a branded live/installer ISO, a transparent
 post-install setup, editable package manifests, practical desktop defaults, and
 small switchable themes.
 
-The workflow is deliberately split in two:
+The live ISO has one installation entry point:
 
-1. Boot the Isarchy ISO and install a minimal Arch system with `archinstall`
-   (or manually).
-2. Copy the bundled Isarchy setup into the installed system before rebooting,
-   or clone this repository there later.
-3. Boot that system as the intended desktop user and run `install.sh` to add
-   the Isarchy desktop.
+```bash
+isarchy-install
+```
 
-The setup script does **not** partition disks, create users, or install a
-bootloader. This keeps destructive installation work in the well-tested Arch
-installer for the first release.
+It opens Archinstall with editable Isarchy defaults. Archinstall handles disks,
+partitioning, users, locale, networking, and the bootloader. During
+Archinstall's post-install phase, Isarchy installs Hyprland, packages, services,
+configuration, and the default theme inside the new system.
 
 Isarchy is strongly inspired by
 [Omarchy](https://github.com/basecamp/omarchy), but is an original codebase and
@@ -53,30 +51,45 @@ run_archiso -i out/isarchy-*.iso
 qemu-system-x86_64 -enable-kvm -m 4G -cdrom out/isarchy-*.iso
 ```
 
-## Install the desktop
+## Install Isarchy
 
-When installing from the ISO, copy the bundled setup after `archinstall`
-returns. First verify Archinstall's target mount, then copy into it:
+Boot the ISO, connect to the internet, and run:
 
 ```bash
-findmnt /mnt/archinstall
-install -d /mnt/archinstall/opt
-cp -a /usr/local/share/isarchy /mnt/archinstall/opt/isarchy
+isarchy-install
 ```
 
-Then boot the installed system and run `/opt/isarchy/install.sh` as your normal
-user. Alternatively, install Git (`sudo pacman -S --needed git`), clone this
-repository, and run:
+The preset selects Linux, NetworkManager, PipeWire-ready base packages,
+systemd-boot, an `isarchy` hostname, zram swap, and US English locale defaults.
+Everything remains visible and adjustable in Archinstall before installation.
+Choose the disk layout, create at least one regular user, and review the
+bootloader. Systemd-boot requires UEFI; select GRUB for legacy BIOS.
+
+The Isarchy payload is staged under `/run`, which `arch-chroot` exposes inside
+the target. Archinstall's `custom_commands` hook runs the target installer while
+filesystems are mounted, avoiding a fragile post-reboot handoff. The first
+regular user receives the desktop configuration. If several regular users were
+created, Isarchy selects the lowest UID. To target a specific account, use
+`isarchy-install --user USER` and create that exact user in Archinstall.
+
+Optional developer tools and Docker can be included with:
+
+```bash
+isarchy-install --with-dev
+```
+
+Docker group membership grants root-equivalent access. Use
+`isarchy-install --dry-run` to inspect orchestration without opening
+Archinstall.
+
+For an existing Arch installation, the standalone setup remains available:
 
 ```bash
 ./install.sh
 ```
 
-Use `./install.sh --dry-run` to inspect commands. The optional
-`./install.sh --with-dev` set adds developer tools and enables Docker; membership
-in the Docker group grants root-equivalent access. Existing managed config
-directories are renamed with a `.pre-isarchy.TIMESTAMP` suffix before new
-defaults are copied. Reboot or log out, sign in on a TTY, then run `Hyprland`.
+Run it as the intended desktop user. `--dry-run` previews commands and
+`--with-dev` enables the optional developer set.
 
 The default choices are Kitty and Wofi. Useful bindings:
 
@@ -102,6 +115,7 @@ isarchy-theme default
 ## Repository layout
 
 ```text
+archinstall/ Archinstall preset with editable Isarchy defaults
 archiso/   Isarchy overlay for Archiso's releng profile
 bin/       User-facing Isarchy commands
 config/    Hyprland, Waybar, Kitty, Wofi, and Mako defaults
@@ -120,8 +134,6 @@ repositories and the profile intentionally tracks the host's installed Archiso
 Owner decisions still open:
 
 - Keep Kitty and Wofi, or move to Alacritty and Walker?
-- Continue using `archinstall` for disk installation, wrap it with a guided
-  Isarchy profile, or build a custom installer?
 - Start Hyprland manually, provide a TTY auto-start option, or add a display
   manager?
 - Which hardware profiles and proprietary driver paths should be officially
@@ -162,37 +174,37 @@ sudo mkarchiso -v -w build/work -o out build/profile
 
 ### Installation
 
-1. Vom Isarchy-ISO booten und mit `archinstall` (oder manuell) ein minimales
-   Arch-System inklusive Benutzer und Bootloader installieren.
-2. Vor dem Neustart Archinstalls Ziel-Einhängepunkt prüfen und die
-   mitgelieferten Dateien dorthin kopieren:
+Vom Isarchy-ISO booten, eine Internetverbindung herstellen und ausführen:
 
 ```bash
-findmnt /mnt/archinstall
-install -d /mnt/archinstall/opt
-cp -a /usr/local/share/isarchy /mnt/archinstall/opt/isarchy
+isarchy-install
 ```
 
-3. Das installierte System booten und als normaler Desktop-Benutzer ausführen:
+Der Befehl öffnet Archinstall mit anpassbaren Isarchy-Vorgaben. Archinstall
+übernimmt Datenträger, Partitionierung, Benutzer, Sprache, Netzwerk und
+Bootloader. Datenträgerlayout und Benutzer müssen gewählt werden. Systemd-boot
+ist die UEFI-Vorgabe; für Legacy-BIOS muss GRUB ausgewählt werden.
 
-```bash
-/opt/isarchy/install.sh
-```
+Nach der Basisinstallation startet Archinstall Isarchys Ziel-Installer über
+`custom_commands` im Chroot. Dieser installiert Hyprland, Pakete, Dienste,
+Konfigurationen und das Standard-Theme für den ersten regulären Benutzer. Der
+Zwischenschritt über einen manuellen Kopier- oder First-Boot-Prozess entfällt.
+Bei mehreren Benutzern kann das Ziel mit `isarchy-install --user BENUTZER`
+festgelegt werden; dieser Benutzer muss in Archinstall angelegt werden.
 
-Alternativ Git mit `sudo pacman -S --needed git` installieren, dieses Repository
-klonen und `./install.sh` starten. `--dry-run` zeigt die geplanten Befehle.
-`--with-dev` installiert Entwicklerwerkzeuge, aktiviert Docker und fügt den
-Benutzer der Docker-Gruppe hinzu; diese Gruppe gewährt praktisch Root-Rechte.
-Das Skript partitioniert **keine** Datenträger und installiert keinen
-Bootloader. Bestehende verwaltete Konfigurationsordner werden vor dem Kopieren
-mit einem Zeitstempel gesichert.
+`isarchy-install --with-dev` installiert zusätzlich Entwicklerwerkzeuge,
+aktiviert Docker und fügt den Benutzer der Docker-Gruppe hinzu; diese Gruppe
+gewährt praktisch Root-Rechte. `isarchy-install --dry-run` zeigt die
+Orchestrierung ohne Installation.
 
-Danach abmelden, auf einer TTY anmelden und `Hyprland` starten. Themes lassen
-sich mit `isarchy-theme list` anzeigen und zum Beispiel mit
-`isarchy-theme dusk` wechseln.
+Auf einem bereits installierten Arch-System bleibt `./install.sh` als normaler
+Desktop-Benutzer nutzbar. Danach auf einer TTY `Hyprland` starten. Themes lassen
+sich mit `isarchy-theme list` anzeigen und etwa mit `isarchy-theme dusk`
+wechseln.
 
 ### Aufbau
 
+- `archinstall/`: anpassbare Isarchy-Vorgaben für Archinstall
 - `archiso/`: Isarchy-Overlay für das Archiso-Releng-Profil
 - `install/`: modulare Installationsschritte
 - `packages/`: Paketlisten im Klartext
@@ -201,10 +213,10 @@ sich mit `isarchy-theme list` anzeigen und zum Beispiel mit
 - `bin/`: Isarchy-Kommandos
 - `scripts/`: Profilvorbereitung und ISO-Build
 
-Offene Produktentscheidungen sind die endgültige Terminal-/Launcher-Auswahl,
-`archinstall` gegenüber einem eigenen Installer, der Startweg für Hyprland und
-der Umfang offiziell unterstützter Hardware. Weitere Schritte stehen in
-[ROADMAP.md](ROADMAP.md).
+Die Installer-Entscheidung ist getroffen: Isarchy verwendet Archinstall mit
+eigenen Vorgaben und Chroot-Handoff. Offen bleiben die endgültige
+Terminal-/Launcher-Auswahl, der Startweg für Hyprland und der Umfang offiziell
+unterstützter Hardware. Weitere Schritte stehen in [ROADMAP.md](ROADMAP.md).
 
 ## License
 

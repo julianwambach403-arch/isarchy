@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+ISARCHY_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly ISARCHY_ROOT
+readonly PRESET="${ISARCHY_ROOT}/archinstall/isarchy.json"
+readonly STAGE_DIR="/run/isarchy"
+readonly RUNTIME_PRESET="/run/isarchy-archinstall.json"
+readonly COMPLETE_MARKER="/run/isarchy-install.complete"
+
+dry_run=0
+with_dev=0
+target_user=""
+
+usage() {
+  cat <<'EOF'
+Usage: isarchy-install [--with-dev] [--user USER] [--dry-run]
+
+Launch the guided Archinstall installer with editable Isarchy defaults, then
+install the Isarchy Hyprland desktop into the new system.
+
+  --with-dev  Also install developer tools and enable Docker. The docker group
+              grants root-equivalent access.
+  --user USER Install desktop defaults for USER. By default, the first regular
+              user created in Archinstall is selected.
+  --dry-run   Print orchestration steps without changing disks or packages.
+EOF
+}
+
+while (( $# )); do
+  case "$1" in
+    --with-dev) with_dev=1 ;;
+    --dry-run) dry_run=1 ;;
+    --user)
+      [[ $# -ge 2 ]] || { printf 'error: --user requires a value\n' >&2; exit 2; }
+      target_user="$2"
+      shift
+      ;;
+    -h|--help) usage; exit 0 ;;
+    *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  esac
+  shift
+done
+
+if [[ -n "${target_user}" && ! "${target_user}" =~ ^[a-z_][a-z0-9_-]*\$?$ ]]; then
+  printf 'error: invalid target username: %s\n' "${target_user}" >&2
+  exit 2
+fi
+
+post_command="/run/isarchy/install/target-install.sh"
+(( with_dev )) && post_command+=" --with-dev"
+[[ -n "${target_user}" ]] && post_command+=" --user ${target_user}"
+
+if (( dry_run )); then
+  printf 'Would stage Isarchy at: %s\n' "${STAGE_DIR}"
+  printf 'Would set Archinstall custom command to: %s\n' "${post_command}"
+  printf 'Would run: archinstall --config %s --mountpoint /mnt/archinstall\n' "${RUNTIME_PRESET}"
+  exit 0
+fi
+
+if (( EUID != 0 )); then
+  printf 'error: isarchy-install must run as root on the Isarchy live ISO\n' >&2
+  exit 1
+fi
+for command in archinstall jq arch-chroot; do
+  command -v "${command}" >/dev/null || {
+    printf 'error: required live-ISO command not found: %s\n' "${command}" >&2
+    exit 1
+  }
+done
+[[ -r "${PRESET}" ]] || {
+  printf 'error: Isarchy Archinstall preset not found: %s\n' "${PRESET}" >&2
+  exit 1
+}
+
+printf '\nIsarchy guided installation\n'
+printf '%s\n' 'Archinstall will open with Isarchy defaults.'
+printf '%s\n' 'Review every setting, especially disk layout, user, locale, and bootloader.'
+printf '%s\n' 'Create at least one regular user; Isarchy cannot target a root-only installation.'
+printf '%s\n\n' 'Systemd-boot is the UEFI default; select GRUB when installing in legacy BIOS mode.'
+
+rm -rf -- "${STAGE_DIR}"
+cp -a -- "${ISARCHY_ROOT}" "${STAGE_DIR}"
+jq --arg command "${post_command}" \
+  '.custom_commands = [$command]' \
+  "${PRESET}" >"${RUNTIME_PRESET}"
+rm -f -- "${COMPLETE_MARKER}"
+
+if ! archinstall --config "${RUNTIME_PRESET}" --mountpoint /mnt/archinstall; then
+  printf 'error: Archinstall failed or was interrupted; Isarchy is not complete\n' >&2
+  exit 1
+fi
+
+if [[ ! -e "${COMPLETE_MARKER}" ]]; then
+  printf 'error: base installation returned without completing the Isarchy layer\n' >&2
+  printf 'Do not assume the desktop setup was installed. Review the Archinstall log.\n' >&2
+  exit 1
+fi
+
+printf '\nIsarchy installation complete. You may reboot into the new system.\n'

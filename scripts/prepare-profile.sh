@@ -44,6 +44,7 @@ install -d \
   "${OUTPUT_DIR}/airootfs/usr/local/share/isarchy"
 cp -a \
   "${ROOT_DIR}/install.sh" \
+  "${ROOT_DIR}/archinstall" \
   "${ROOT_DIR}/install" \
   "${ROOT_DIR}/packages" \
   "${ROOT_DIR}/config" \
@@ -53,7 +54,7 @@ cp -a \
 
 cat >"${OUTPUT_DIR}/airootfs/usr/local/bin/isarchy-install" <<'EOF'
 #!/usr/bin/env bash
-exec /usr/local/share/isarchy/install.sh "$@"
+exec /usr/local/share/isarchy/bin/isarchy-install "$@"
 EOF
 chmod 0755 "${OUTPUT_DIR}/airootfs/usr/local/bin/isarchy-install"
 

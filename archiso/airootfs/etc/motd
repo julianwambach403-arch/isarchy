@@ -5,13 +5,10 @@
   ╰──────────────────────────────────────────────╯
 
   1. Connect to the internet (iwctl or an Ethernet cable).
-  2. Install base Arch with: archinstall
-  3. Before rebooting, verify and copy into Archinstall's target:
-       findmnt /mnt/archinstall
-       install -d /mnt/archinstall/opt
-       cp -a /usr/local/share/isarchy /mnt/archinstall/opt/isarchy
-  4. Boot the installed system and, as your desktop user, run:
-       /opt/isarchy/install.sh
+  2. Start the guided installer:
+       isarchy-install
+  3. Review disk, locale, and bootloader settings, and create a regular user.
 
-  Advanced users may install Arch manually and run the same setup afterward.
-  The setup does not partition disks or install a bootloader.
+  Isarchy runs Archinstall for the base system and installs Hyprland,
+  applications, configuration, and the default theme before Archinstall exits.
+  For developer tools and Docker, use: isarchy-install --with-dev

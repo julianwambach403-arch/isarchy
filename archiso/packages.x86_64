@@ -1,6 +1,7 @@
 # Additions to Arch's releng package set.
 archinstall
 git
+jq
 networkmanager
 rsync
 shellcheck
