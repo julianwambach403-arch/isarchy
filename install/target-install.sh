@@ -34,6 +34,10 @@ while (( $# )); do
   shift
 done
 
+if [[ -x "${ISARCHY_ROOT}/bin/isarchy-logo" ]]; then
+  "${ISARCHY_ROOT}/bin/isarchy-logo"
+fi
+
 log() {
   printf '\033[1;36m==>\033[0m %s\n' "$*"
 }
@@ -121,7 +125,7 @@ fi
 run mkdir -p -- "${target_home}/.config" "${target_home}/.local/bin" \
   "${target_home}/.local/share/isarchy/themes"
 
-for component in hypr waybar kitty wofi mako; do
+for component in hypr waybar kitty wofi mako fastfetch; do
   if [[ -e "${target_home}/.config/${component}" ]]; then
     run mv -- "${target_home}/.config/${component}" \
       "${target_home}/.config/${component}.pre-isarchy.$(date +%Y%m%d%H%M%S)"
@@ -131,6 +135,7 @@ done
 run cp -a -- "${ISARCHY_ROOT}/themes/." "${target_home}/.local/share/isarchy/themes/"
 run install -m 0755 "${ISARCHY_ROOT}/bin/isarchy-theme" \
   "${target_home}/.local/bin/isarchy-theme"
+run install -m 0755 "${ISARCHY_ROOT}/bin/isarchy-logo" /usr/local/bin/isarchy-logo
 run chown -R "${target_user}:${target_group}" "${target_home}/.config" "${target_home}/.local"
 run runuser -u "${target_user}" -- env HOME="${target_home}" \
   "${target_home}/.local/bin/isarchy-theme" default

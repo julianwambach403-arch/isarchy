@@ -112,6 +112,23 @@ isarchy-theme dusk
 isarchy-theme default
 ```
 
+## Branding and system information
+
+`isarchy-logo` prints the official Isarchy banner: the 256-color blue (`75`)
+triangle, silver (`250`) ISARCHY block lettering, and `ISARCHY LINUX` tagline.
+The same banner appears in the live login MOTD and at the start of both
+installer paths.
+
+Fastfetch is installed with a custom configuration that renders
+`isarchy-logo` above the system summary:
+
+```bash
+fastfetch
+```
+
+The default theme uses the corresponding blue (`#5fafff`) and silver
+(`#bcbcbc`) palette for borders, highlights, text, and wallpaper accents.
+
 ## Repository layout
 
 ```text
@@ -201,6 +218,18 @@ Auf einem bereits installierten Arch-System bleibt `./install.sh` als normaler
 Desktop-Benutzer nutzbar. Danach auf einer TTY `Hyprland` starten. Themes lassen
 sich mit `isarchy-theme list` anzeigen und etwa mit `isarchy-theme dusk`
 wechseln.
+
+### Branding und Systeminformationen
+
+`isarchy-logo` zeigt das offizielle Banner: das blaue 256-Farben-Dreieck
+(`75`), den silbernen ISARCHY-Schriftzug (`250`) und die Zeile
+`ISARCHY LINUX`. Dasselbe Banner erscheint im Live-Login-MOTD und am Anfang
+beider Installationswege.
+
+Fastfetch wird mit einer eigenen Konfiguration installiert und zeigt dieses
+Logo über den Systeminformationen. Der Aufruf lautet `fastfetch`. Das
+Standard-Theme verwendet die passende Blau-/Silber-Palette für Rahmen,
+Hervorhebungen, Text und Hintergrundbild.
 
 ### Aufbau
 

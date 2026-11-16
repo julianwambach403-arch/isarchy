@@ -3,6 +3,6 @@ PRETTY_NAME="Isarchy Live"
 ID=isarchy
 ID_LIKE=arch
 BUILD_ID=rolling
-ANSI_COLOR="38;2;115;210;200"
+ANSI_COLOR="38;2;95;175;255"
 VARIANT="Hyprland Live Installer"
 VARIANT_ID=hyprland

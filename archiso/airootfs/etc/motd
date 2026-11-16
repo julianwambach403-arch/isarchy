@@ -1,9 +1,3 @@
-
-  ╭──────────────────────────────────────────────╮
-  │                  ISARCHY                     │
-  │      Arch Linux + Hyprland, made clear       │
-  ╰──────────────────────────────────────────────╯
-
   1. Connect to the internet (iwctl or an Ethernet cable).
   2. Start the guided installer:
        isarchy-install

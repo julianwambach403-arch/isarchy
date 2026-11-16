@@ -47,6 +47,10 @@ if [[ -n "${target_user}" && ! "${target_user}" =~ ^[a-z_][a-z0-9_-]*\$?$ ]]; th
   exit 2
 fi
 
+if [[ -x "${ISARCHY_ROOT}/bin/isarchy-logo" ]]; then
+  "${ISARCHY_ROOT}/bin/isarchy-logo"
+fi
+
 post_command="/run/isarchy/install/target-install.sh"
 (( with_dev )) && post_command+=" --with-dev"
 [[ -n "${target_user}" ]] && post_command+=" --user ${target_user}"

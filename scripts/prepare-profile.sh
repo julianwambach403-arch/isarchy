@@ -56,6 +56,18 @@ cat >"${OUTPUT_DIR}/airootfs/usr/local/bin/isarchy-install" <<'EOF'
 #!/usr/bin/env bash
 exec /usr/local/share/isarchy/bin/isarchy-install "$@"
 EOF
-chmod 0755 "${OUTPUT_DIR}/airootfs/usr/local/bin/isarchy-install"
+cat >"${OUTPUT_DIR}/airootfs/usr/local/bin/isarchy-logo" <<'EOF'
+#!/usr/bin/env bash
+exec /usr/local/share/isarchy/bin/isarchy-logo "$@"
+EOF
+chmod 0755 \
+  "${OUTPUT_DIR}/airootfs/usr/local/bin/isarchy-install" \
+  "${OUTPUT_DIR}/airootfs/usr/local/bin/isarchy-logo"
+
+# Render the official ANSI-colored logo into the login banner, then append the
+# tracked installation instructions.
+bash "${ROOT_DIR}/bin/isarchy-logo" >"${OUTPUT_DIR}/airootfs/etc/motd"
+printf '\n' >>"${OUTPUT_DIR}/airootfs/etc/motd"
+cat "${OVERLAY_DIR}/airootfs/etc/motd" >>"${OUTPUT_DIR}/airootfs/etc/motd"
 
 printf 'Prepared Isarchy archiso profile: %s\n' "${OUTPUT_DIR}"

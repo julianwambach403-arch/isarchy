@@ -31,6 +31,10 @@ while (( $# )); do
 done
 export ISARCHY_DRY_RUN ISARCHY_WITH_DEV
 
+if [[ -x "${ISARCHY_ROOT}/bin/isarchy-logo" ]]; then
+  "${ISARCHY_ROOT}/bin/isarchy-logo"
+fi
+
 # shellcheck source=install/lib.sh
 source "${ISARCHY_ROOT}/install/lib.sh"
 # shellcheck source=install/10-packages.sh

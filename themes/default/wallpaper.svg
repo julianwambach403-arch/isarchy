@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
   <defs>
     <radialGradient id="glow" cx="72%" cy="24%" r="75%">
-      <stop offset="0" stop-color="#214b4d"/>
-      <stop offset=".5" stop-color="#15272b"/>
-      <stop offset="1" stop-color="#101418"/>
+      <stop offset="0" stop-color="#274b70"/>
+      <stop offset=".5" stop-color="#17283a"/>
+      <stop offset="1" stop-color="#0d131a"/>
     </radialGradient>
   </defs>
   <rect width="2560" height="1440" fill="url(#glow)"/>
-  <path d="M0 1120C460 930 830 1240 1260 1040s760-80 1300-280v680H0z" fill="#73d2c8" opacity=".08"/>
-  <circle cx="1840" cy="350" r="180" fill="none" stroke="#73d2c8" stroke-width="2" opacity=".35"/>
-  <circle cx="1840" cy="350" r="112" fill="none" stroke="#e6f1f0" stroke-width="1" opacity=".16"/>
+  <path d="M0 1120C460 930 830 1240 1260 1040s760-80 1300-280v680H0z" fill="#5fafff" opacity=".08"/>
+  <circle cx="1840" cy="350" r="180" fill="none" stroke="#5fafff" stroke-width="2" opacity=".35"/>
+  <circle cx="1840" cy="350" r="112" fill="none" stroke="#bcbcbc" stroke-width="1" opacity=".16"/>
 </svg>
