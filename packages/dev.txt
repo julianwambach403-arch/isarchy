@@ -1,0 +1,10 @@
+# Opinionated, optional development defaults
+docker
+docker-compose
+github-cli
+neovim
+nodejs
+npm
+python
+python-pip
+tmux

@@ -1,0 +1,33 @@
+@import "colors.css";
+
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 14px;
+}
+
+window {
+  margin: 0;
+  padding: 12px;
+  border: 2px solid @accent;
+  border-radius: 10px;
+  background-color: @background;
+}
+
+#input {
+  margin: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  color: @foreground;
+  background-color: @surface;
+}
+
+#entry {
+  padding: 9px;
+  border-radius: 6px;
+  color: @foreground;
+}
+
+#entry:selected {
+  background-color: @accent;
+  color: @background;
+}

@@ -1,0 +1,19 @@
+# Core command-line and system utilities
+base-devel
+bash-completion
+curl
+fd
+fzf
+git
+jq
+less
+man-db
+openssh
+pacman-contrib
+reflector
+ripgrep
+rsync
+sudo
+unzip
+wget
+zip

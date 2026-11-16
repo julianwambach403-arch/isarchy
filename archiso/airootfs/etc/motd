@@ -1,0 +1,17 @@
+
+  ╭──────────────────────────────────────────────╮
+  │                  ISARCHY                     │
+  │      Arch Linux + Hyprland, made clear       │
+  ╰──────────────────────────────────────────────╯
+
+  1. Connect to the internet (iwctl or an Ethernet cable).
+  2. Install base Arch with: archinstall
+  3. Before rebooting, verify and copy into Archinstall's target:
+       findmnt /mnt/archinstall
+       install -d /mnt/archinstall/opt
+       cp -a /usr/local/share/isarchy /mnt/archinstall/opt/isarchy
+  4. Boot the installed system and, as your desktop user, run:
+       /opt/isarchy/install.sh
+
+  Advanced users may install Arch manually and run the same setup afterward.
+  The setup does not partition disks or install a bootloader.

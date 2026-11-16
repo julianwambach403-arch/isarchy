@@ -1,0 +1,41 @@
+# Hyprland and the Wayland desktop
+hyprland
+hypridle
+hyprlock
+xdg-desktop-portal-hyprland
+waybar
+wofi
+mako
+kitty
+
+# Desktop integration and daily applications
+blueman
+bluez
+bluez-utils
+brightnessctl
+firefox
+gvfs
+network-manager-applet
+networkmanager
+playerctl
+polkit-gnome
+qt5-wayland
+qt6-wayland
+swaybg
+thunar
+tumbler
+
+# Audio, screenshots, clipboard
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+grim
+slurp
+wl-clipboard
+
+# Fonts
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+ttf-jetbrains-mono-nerd

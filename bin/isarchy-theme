@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly THEMES_DIR="${ISARCHY_THEMES_DIR:-${HOME}/.local/share/isarchy/themes}"
+readonly STATE_DIR="${HOME}/.config/isarchy"
+
+list_themes() {
+  local dir
+  for dir in "${THEMES_DIR}"/*; do
+    [[ -f "${dir}/theme.conf" ]] && basename -- "${dir}"
+  done
+}
+
+usage() {
+  cat <<EOF
+Usage: isarchy-theme <name|list|current>
+
+Available themes:
+$(list_themes | sed 's/^/  /')
+EOF
+}
+
+case "${1:-}" in
+  list) list_themes; exit 0 ;;
+  current)
+    [[ -r "${STATE_DIR}/current" ]] && cat "${STATE_DIR}/current"
+    exit 0
+    ;;
+  -h|--help|"") usage; exit 0 ;;
+esac
+
+theme_name="$1"
+if [[ ! "${theme_name}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+  printf 'Invalid theme name: %s\n' "${theme_name}" >&2
+  exit 2
+fi
+readonly THEME_DIR="${THEMES_DIR}/${theme_name}"
+if [[ ! -r "${THEME_DIR}/theme.conf" || ! -r "${THEME_DIR}/wallpaper.svg" ]]; then
+  printf 'Theme not found: %s\n' "${theme_name}" >&2
+  usage >&2
+  exit 1
+fi
+
+# Theme files are installed together with this trusted command.
+background=
+surface=
+foreground=
+muted=
+accent=
+warning=
+critical=
+# shellcheck source=/dev/null
+source "${THEME_DIR}/theme.conf"
+for color in background surface foreground muted accent warning critical; do
+  value="${!color:-}"
+  if [[ ! "${value}" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+    printf 'Invalid %s color in %s\n' "${color}" "${THEME_DIR}/theme.conf" >&2
+    exit 1
+  fi
+done
+
+mkdir -p \
+  "${STATE_DIR}" \
+  "${HOME}/.config/hypr" \
+  "${HOME}/.config/kitty" \
+  "${HOME}/.config/mako" \
+  "${HOME}/.config/waybar" \
+  "${HOME}/.config/wofi"
+
+cat >"${HOME}/.config/hypr/colors.conf" <<EOF
+\$background = rgb(${background#\#})
+\$foreground = rgb(${foreground#\#})
+\$accent = rgb(${accent#\#})
+\$muted = rgb(${muted#\#})
+\$shadow = rgba(${background#\#}cc)
+EOF
+
+cat >"${HOME}/.config/hypr/colors.lua" <<EOF
+return {
+    background = "rgb(${background#\#})",
+    foreground = "rgb(${foreground#\#})",
+    accent = "rgb(${accent#\#})",
+    muted = "rgb(${muted#\#})",
+    shadow = "rgba(${background#\#}cc)",
+}
+EOF
+
+cat >"${HOME}/.config/waybar/colors.css" <<EOF
+@define-color background ${background};
+@define-color surface ${surface};
+@define-color foreground ${foreground};
+@define-color muted ${muted};
+@define-color accent ${accent};
+@define-color warning ${warning};
+@define-color critical ${critical};
+EOF
+cp -- "${HOME}/.config/waybar/colors.css" "${HOME}/.config/wofi/colors.css"
+
+cat >"${HOME}/.config/kitty/theme.conf" <<EOF
+background ${background}
+foreground ${foreground}
+cursor ${accent}
+selection_background ${accent}
+selection_foreground ${background}
+color0 ${background}
+color7 ${foreground}
+color8 ${muted}
+color12 ${accent}
+EOF
+
+cat >"${HOME}/.config/mako/theme.conf" <<EOF
+background-color=${background}
+text-color=${foreground}
+border-color=${accent}
+progress-color=over ${surface}
+EOF
+
+ln -sfn -- "${THEME_DIR}/wallpaper.svg" "${STATE_DIR}/wallpaper"
+printf '%s\n' "${theme_name}" >"${STATE_DIR}/current"
+
+if command -v hyprctl >/dev/null; then
+  hyprctl reload >/dev/null || true
+fi
+if command -v makoctl >/dev/null; then
+  makoctl reload >/dev/null || true
+fi
+pkill -SIGUSR2 waybar 2>/dev/null || true
+if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && command -v swaybg >/dev/null; then
+  pkill -x swaybg 2>/dev/null || true
+  swaybg -i "${STATE_DIR}/wallpaper" -m fill >/dev/null 2>&1 &
+  disown
+fi
+
+printf 'Applied Isarchy theme: %s\n' "${theme_name}"
