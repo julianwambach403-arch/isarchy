@@ -23,4 +23,13 @@ file_permissions=(
   ["/usr/local/bin/isarchy-install"]="0:0:755"
   ["/usr/local/bin/isarchy-logo"]="0:0:755"
   ["/usr/local/bin/livecd-sound"]="0:0:755"
+  ["/usr/local/share/isarchy/install.sh"]="0:0:755"
+  ["/usr/local/share/isarchy/bin/isarchy-install"]="0:0:755"
+  ["/usr/local/share/isarchy/bin/isarchy-logo"]="0:0:755"
+  ["/usr/local/share/isarchy/bin/isarchy-theme"]="0:0:755"
+  ["/usr/local/share/isarchy/install/10-packages.sh"]="0:0:755"
+  ["/usr/local/share/isarchy/install/20-config.sh"]="0:0:755"
+  ["/usr/local/share/isarchy/install/30-services.sh"]="0:0:755"
+  ["/usr/local/share/isarchy/install/lib.sh"]="0:0:755"
+  ["/usr/local/share/isarchy/install/target-install.sh"]="0:0:755"
 )

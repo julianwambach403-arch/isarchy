@@ -34,7 +34,9 @@ sudo ./scripts/build-iso.sh
 The ISO is written to `out/`. The build script copies Archiso's installed
 `releng` profile to `build/profile`, applies the tracked `archiso/` overlay,
 adds this repository's installer assets, brands the inherited BIOS/UEFI menu
-entries, and invokes `mkarchiso`.
+entries, and invokes `mkarchiso`. Before profile assembly, it verifies that
+every shipped Isarchy script is executable both in Git and in Archiso's
+`file_permissions`. Root-owned `build/` and `out/` artifacts are ignored by Git.
 
 To inspect or invoke `mkarchiso` directly:
 
@@ -180,7 +182,10 @@ sudo ./scripts/build-iso.sh
 Das ISO landet unter `out/`. Das Build-Skript kopiert das installierte
 Archiso-`releng`-Profil nach `build/profile`, legt das Isarchy-Overlay darüber,
 fügt die Installer-Dateien hinzu, brandet die BIOS-/UEFI-Menüs und startet
-`mkarchiso`.
+`mkarchiso`. Vorher wird geprüft, dass jedes mitgelieferte Isarchy-Skript sowohl
+im Repository als auch über Archisos `file_permissions` ausführbar ist. Die
+häufig Root gehörenden Verzeichnisse `build/` und `out/` werden von Git
+ignoriert.
 
 Direkter Aufruf:
 

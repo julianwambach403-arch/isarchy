@@ -7,6 +7,8 @@ readonly OVERLAY_DIR="${ROOT_DIR}/archiso"
 readonly OUTPUT_DIR="${1:-${ROOT_DIR}/build/profile}"
 readonly RELENG_DIR="${RELENG_DIR:-/usr/share/archiso/configs/releng}"
 
+"${ROOT_DIR}/scripts/check-executables.sh"
+
 if [[ ! -d "${RELENG_DIR}" ]]; then
   printf 'error: releng profile not found at %s\n' "${RELENG_DIR}" >&2
   printf 'Install archiso, or set RELENG_DIR to a releng profile.\n' >&2
